@@ -74,6 +74,11 @@ func NewReaper(ctx context.Context, sessionID string, provider ReaperProvider, r
 		WaitingFor: wait.ForListeningPort(listeningPort),
 	}
 
+	tcConfig := readTCPropsFile()
+	if tcConfig.RyukPrivileged || os.Getenv("TESTCONTAINERS_RYUK_CONTAINER_PRIVILEGED") == "true" {
+		req.Privileged = true
+	}
+
 	// Attach reaper container to a requested network if it is specified
 	if p, ok := provider.(*DockerProvider); ok {
 		req.Networks = append(req.Networks, p.defaultNetwork)
